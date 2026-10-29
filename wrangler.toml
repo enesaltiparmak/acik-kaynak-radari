@@ -1,0 +1,5 @@
+# Cloudflare Pages projesinin kod olarak tanımı (IaC).
+# Derleme Cloudflare tarafında Git entegrasyonuyla yapılır: npm run build -> dist/
+name = "acik-kaynak-radari"
+compatibility_date = "2026-10-01"
+pages_build_output_dir = "./dist"
