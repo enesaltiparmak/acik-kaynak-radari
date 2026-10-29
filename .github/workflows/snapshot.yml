@@ -1,0 +1,41 @@
+name: snapshot
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Prepare data branch
+        run: |
+          git fetch origin data:data || true
+          if git rev-parse --verify --quiet data >/dev/null; then
+            git worktree add data-out data
+          else
+            git worktree add --orphan -b data data-out
+          fi
+
+      - name: Fetch snapshot
+        env:
+          GH_TOKEN: ${{ secrets.GH_DATA_TOKEN }}
+        run: node scripts/snapshot.mjs --out data-out
+
+      - name: Commit to data branch
+        run: |
+          cd data-out
+          git config user.name "radar-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add latest.json history.json
+          git diff --cached --quiet || git commit -m "data: snapshot $(date -u +%Y-%m-%d)"
+          git push origin HEAD:data
