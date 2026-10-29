@@ -1,5 +1,9 @@
-# Cloudflare Pages projesinin kod olarak tanımı (IaC).
-# Derleme Cloudflare tarafında Git entegrasyonuyla yapılır: npm run build -> dist/
+# Cloudflare Workers (statik varlıklar) projesinin kod olarak tanımı (IaC).
+# Cloudflare Git entegrasyonu main'e her push'ta: npm run build -> npx wrangler deploy
+# Güvenlik başlıkları dist/_headers dosyasından uygulanır.
 name = "acik-kaynak-radari"
 compatibility_date = "2026-10-01"
-pages_build_output_dir = "./dist"
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
