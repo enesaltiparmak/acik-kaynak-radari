@@ -1,25 +1,41 @@
+# Günlük veri çekimi: GitHub API'den snapshot alır ve "data" dalına yazar.
+# Kod (main) korumalı daldır; bot yalnızca ayrı "data" dalına yazar.
 name: snapshot
 
 on:
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 3 * * *" # her gün 06:17 TSİ
   workflow_dispatch:
 
-permissions: write-all
+permissions: {}
+
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
 
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # yalnızca data dalına push için
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Harden runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
-          node-version: 22
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Prepare data branch
         run: |
-          git fetch origin data:data || true
+          git fetch --depth=1 "https://github.com/${GITHUB_REPOSITORY}.git" data:data || true
           if git rev-parse --verify --quiet data >/dev/null; then
             git worktree add data-out data
           else
@@ -27,15 +43,27 @@ jobs:
           fi
 
       - name: Fetch snapshot
+        id: snap
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GH_DATA_TOKEN }}
         run: node scripts/snapshot.mjs --out data-out
 
       - name: Commit to data branch
+        env:
+          PUSH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.snap.outcome }}
         run: |
           cd data-out
           git config user.name "radar-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add latest.json history.json
-          git diff --cached --quiet || git commit -m "data: snapshot $(date -u +%Y-%m-%d)"
-          git push origin HEAD:data
+          if git diff --cached --quiet; then echo "Değişiklik yok"; exit 0; fi
+          git commit -m "data: snapshot $(date -u +%Y-%m-%dT%H:%MZ) ($OUTCOME)"
+          git push "https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:data
+
+      - name: Fail if snapshot failed
+        if: steps.snap.outcome == 'failure'
+        run: |
+          echo "::error::Snapshot başarısız; son başarılı veri korundu."
+          exit 1
