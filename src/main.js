@@ -2,9 +2,13 @@ import '@fontsource-variable/georama';
 import '@fontsource-variable/roboto-mono';
 import './style.css';
 import { loadData, simulation } from './data.js';
-import { drawGrowth, drawTrend } from './charts.js';
 import { setupPalette } from './palette.js';
 import { growth } from '../scripts/lib.mjs';
+
+// Chart.js ayrı parça olarak yüklenir; KPI ve tablo grafik kütüphanesini beklemeden çizilir.
+let charts = null;
+const chartsReady = import('./charts.js').then((m) => { charts = m; if (state.data) renderCharts(derived()); });
+chartsReady.catch(() => { /* grafikler yüklenemezse özet cümleleri ve tablolar yine görünür */ });
 
 const $ = (id) => document.getElementById(id);
 const nf = new Intl.NumberFormat('tr-TR');
@@ -168,7 +172,7 @@ function renderCharts({ rows }) {
   const growthBox = $('growth-box');
   if (top.length) {
     growthBox.hidden = false;
-    drawGrowth($('growth-chart'), top, selectRepo);
+    charts?.drawGrowth($('growth-chart'), top, selectRepo);
     const sum = top.reduce((s, r) => s + r.delta, 0);
     const span = Math.max(...top.map((r) => r.spanDays));
     const note = span < p ? ` Zaman serisi henüz ${span} günlük olduğu için artış ${span} günü kapsıyor.` : '';
@@ -193,7 +197,7 @@ function renderCharts({ rows }) {
   state.selected = sel.id;
   trendBox.hidden = false;
   $('trend-name').textContent = sel.id;
-  drawTrend($('trend-chart'), sel.points);
+  charts?.drawTrend($('trend-chart'), sel.points);
   const first = sel.points[0];
   const last = sel.points[sel.points.length - 1];
   const fmt = (d) => df.format(new Date(`${d}T12:00:00Z`));
