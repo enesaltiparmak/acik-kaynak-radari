@@ -1,0 +1,5 @@
+Contact: https://github.com/enesaltiparmak/acik-kaynak-radari/security/advisories/new
+Expires: 2027-10-29T00:00:00.000Z
+Preferred-Languages: tr, en
+Canonical: https://acik-kaynak-radari.pages.dev/.well-known/security.txt
+Policy: https://github.com/enesaltiparmak/acik-kaynak-radari/blob/main/SECURITY.md
