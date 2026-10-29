@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Türkiye Açık Kaynak Radarı</title>
+    <meta name="description" content="Türkiye'den çıkan açık kaynak projeleri günlük takip eden pano: en hızlı büyüyenler, good first issue filtresi, yıldız zaman serisi." />
+    <meta name="theme-color" content="#0f1115" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">İçeriğe geç</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="mono">~/radar</span>
+        <h1>Türkiye Açık Kaynak Radarı</h1>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="kbd-btn" id="open-palette" aria-keyshortcuts="Control+K Meta+K">
+          <span>Komut paleti</span> <kbd data-mod>Ctrl</kbd><kbd>K</kbd>
+        </button>
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Temayı değiştir" aria-keyshortcuts="T">
+          <span aria-hidden="true">◐</span>
+        </button>
+        <button type="button" class="icon-btn" id="open-help" aria-label="Klavye kısayolları" aria-keyshortcuts="Shift+?">
+          <span aria-hidden="true">?</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="meta-bar mono" id="meta-bar">
+      <span id="updated">Son güncelleme: yükleniyor…</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Kaynak: <a href="https://docs.github.com/graphql" rel="noopener" target="_blank">GitHub GraphQL API</a></span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="#hakkinda">Yöntem ve sınırlar</a>
+    </div>
+
+    <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+    <main id="main" tabindex="-1">
+      <section aria-labelledby="kpi-title" class="kpis-wrap">
+        <h2 id="kpi-title" class="sr-only">Özet göstergeler</h2>
+        <div class="kpis" id="kpis" aria-busy="true">
+          <div class="kpi skeleton"></div><div class="kpi skeleton"></div>
+          <div class="kpi skeleton"></div><div class="kpi skeleton"></div>
+        </div>
+      </section>
+
+      <section class="panel filters" aria-labelledby="filters-title">
+        <h2 id="filters-title" class="panel-title"><span class="mono">$</span> filtreler</h2>
+        <form id="filters" class="filter-grid" role="search">
+          <label class="field field-search">
+            <span>Proje ara <kbd>/</kbd></span>
+            <input id="f-q" type="search" placeholder="ad, açıklama, konu…" autocomplete="off" aria-keyshortcuts="/" />
+          </label>
+          <label class="field">
+            <span>Dil</span>
+            <select id="f-lang"><option value="">Tümü</option></select>
+          </label>
+          <label class="field">
+            <span>Dönem</span>
+            <select id="f-period">
+              <option value="7">Son 7 gün</option>
+              <option value="30">Son 30 gün</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>En az yıldız</span>
+            <select id="f-min">
+              <option value="0">Hepsi</option>
+              <option value="100">100+</option>
+              <option value="500">500+</option>
+              <option value="1000">1000+</option>
+            </select>
+          </label>
+          <label class="check">
+            <input id="f-gfi" type="checkbox" aria-keyshortcuts="G" />
+            <span>Yalnız <b>good first issue</b> olanlar <kbd>G</kbd></span>
+          </label>
+          <button type="button" id="f-reset" class="ghost-btn">Filtreleri sıfırla</button>
+        </form>
+        <p class="result-count mono" id="result-count" aria-live="polite"></p>
+      </section>
+
+      <div class="charts">
+        <section class="panel" aria-labelledby="growth-title">
+          <h2 id="growth-title" class="panel-title"><span class="mono">▲</span> En hızlı büyüyenler</h2>
+          <p class="chart-summary" id="growth-summary"></p>
+          <div class="chart-box" id="growth-box">
+            <canvas id="growth-chart" role="img" aria-describedby="growth-summary"></canvas>
+          </div>
+          <details class="as-table">
+            <summary>Veriyi tablo olarak gör</summary>
+            <div id="growth-table" class="table-scroll"></div>
+          </details>
+        </section>
+
+        <section class="panel" aria-labelledby="trend-title">
+          <h2 id="trend-title" class="panel-title"><span class="mono">~</span> Yıldız zaman serisi: <span id="trend-name" class="mono"></span></h2>
+          <p class="chart-summary" id="trend-summary"></p>
+          <div class="chart-box" id="trend-box">
+            <canvas id="trend-chart" role="img" aria-describedby="trend-summary"></canvas>
+          </div>
+          <p class="legend-note">Her nokta bir günlük snapshot ölçümüdür. Seri, ilk snapshot gününden itibaren her gün bir nokta büyür.</p>
+          <details class="as-table">
+            <summary>Veriyi tablo olarak gör</summary>
+            <div id="trend-table" class="table-scroll"></div>
+          </details>
+        </section>
+      </div>
+
+      <section class="panel" aria-labelledby="table-title">
+        <h2 id="table-title" class="panel-title"><span class="mono">#</span> Projeler</h2>
+        <div class="table-scroll" id="repo-table-wrap">
+          <table class="data" id="repo-table">
+            <caption class="sr-only">Projeler; sütun başlıklarındaki düğmelerle sıralanabilir</caption>
+            <thead><tr id="repo-head"></tr></thead>
+            <tbody id="repo-body"></tbody>
+          </table>
+        </div>
+        <div id="empty" class="empty" hidden>
+          <p class="mono">0 sonuç</p>
+          <p>Filtrelerinize uyan proje yok. Aramayı kısaltmayı veya dili "Tümü" yapmayı deneyin.</p>
+          <button type="button" class="ghost-btn" data-action="reset">Filtreleri sıfırla</button>
+        </div>
+        <button type="button" id="more" class="ghost-btn more" hidden>Daha fazla göster</button>
+      </section>
+
+      <section class="panel about" id="hakkinda" aria-labelledby="about-title">
+        <h2 id="about-title" class="panel-title"><span class="mono">//</span> Yöntem ve sınırlar</h2>
+        <p id="method"></p>
+        <ul>
+          <li>Veri her gün GitHub Actions ile çekilir ve depoya anlık görüntü (snapshot) olarak yazılır; zaman serisi bu görüntülerden birikir.</li>
+          <li>GitHub geçmiş yıldız sayısı ve yıldız verenlerin tarihlerini sunmadığı için seri yalnızca ilk snapshot gününden başlar; "son 7 gün" verisi birikene kadar artış daha kısa bir dönemi kapsar ve bu durum ekranda belirtilir.</li>
+          <li>Kullanıcı profili, konum veya takipçi bilgisi yayımlanmaz; yalnızca herkese açık depo bilgisi gösterilir.</li>
+          <li>Bu pano kurgusal bir öğrenci topluluğu için hazırlanmış bir ders projesidir; GitHub ile bağlantısı yoktur.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <span>Enes Altıparmak · MCBÜ Büyük Veri Analistliği</span>
+      <a href="https://github.com/enesaltiparmak/acik-kaynak-radari" rel="noopener" target="_blank">Kaynak kod</a>
+    </footer>
+
+    <dialog id="palette" class="palette" aria-label="Komut paleti">
+      <div class="palette-input">
+        <span class="mono" aria-hidden="true">&gt;</span>
+        <input id="palette-input" type="text" role="combobox" aria-expanded="true" aria-controls="palette-list"
+          aria-autocomplete="list" aria-label="Komut veya proje ara" placeholder="Komut veya proje yazın…" autocomplete="off" />
+        <kbd>Esc</kbd>
+      </div>
+      <ul id="palette-list" role="listbox" aria-label="Sonuçlar"></ul>
+      <p class="palette-hint mono">↑↓ seç · Enter çalıştır · Esc kapat</p>
+    </dialog>
+
+    <dialog id="help" class="help" aria-labelledby="help-title">
+      <h2 id="help-title">Klavye kısayolları</h2>
+      <dl class="shortcuts">
+        <dt><kbd data-mod>Ctrl</kbd> <kbd>K</kbd></dt><dd>Komut paleti</dd>
+        <dt><kbd>/</kbd></dt><dd>Proje aramaya odaklan</dd>
+        <dt><kbd>G</kbd></dt><dd>Good first issue filtresini aç/kapat</dd>
+        <dt><kbd>T</kbd></dt><dd>Açık/koyu tema</dd>
+        <dt><kbd>?</kbd></dt><dd>Bu pencere</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Pencereyi kapat</dd>
+      </dl>
+      <p>Tek tuşlu kısayollar bir metin alanına yazarken çalışmaz.</p>
+      <form method="dialog"><button class="ghost-btn">Kapat</button></form>
+    </dialog>
+  </body>
+</html>
