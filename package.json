@@ -1,0 +1,27 @@
+{
+  "name": "acik-kaynak-radari",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Türkiye Açık Kaynak Radarı: GitHub verisinden günlük zaman serisi biriktiren açık kaynak panosu",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "node scripts/prebuild.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "snapshot": "node scripts/snapshot.mjs --out public/data",
+    "test": "node --test scripts/lib.test.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/georama": "5.3.0",
+    "@fontsource-variable/roboto-mono": "5.3.0",
+    "chart.js": "4.6.1"
+  },
+  "devDependencies": {
+    "vite": "8.3.5"
+  }
+}
