@@ -2,7 +2,7 @@
 
 Türkiye'den çıkan açık kaynak projeleri her gün takip eden, katkı verilecek proje arayan öğrenciler için hazırlanmış bir veri ürünü. GitHub verisinden kendi zaman serisini biriktirir, haftanın en hızlı büyüyen projelerini ve "good first issue" etiketli işleri gösterir. Her işlevi klavyeyle (Ctrl/Cmd + K) kullanılabilir.
 
-- **Canlı ürün:** <https://acik-kaynak-radari.pages.dev>
+- **Canlı ürün:** <https://acik-kaynak-radari.enesaltipsrmak.workers.dev>
 - **Veri dalı:** [`data`](https://github.com/enesaltiparmak/acik-kaynak-radari/tree/data)
 - **Ders:** MCBÜ Büyük Veri Analistliği. BVA 2245 Kullanıcı Arayüzü Tasarımı ve Bulut Bilişim ve Siber Güvenlik (aynı ürün, aynı depo).
 
@@ -19,7 +19,7 @@ Türkiye'den çıkan açık kaynak projeleri her gün takip eden, katkı verilec
 flowchart LR
   CRON["GitHub Actions<br/>snapshot (her gün 06:17)"] -- "GraphQL, salt okunur token" --> API["GitHub API"]
   CRON -- "latest.json + history.json" --> DATA[("data dalı")]
-  MAIN[("main dalı<br/>korumalı")] -- "Git entegrasyonu" --> CF["Cloudflare Pages<br/>statik site + _headers"]
+  MAIN[("main dalı<br/>korumalı")] -- "Git entegrasyonu" --> CF["Cloudflare Workers<br/>statik varlıklar + _headers"]
   BROWSER["Tarayıcı"] --> CF
   BROWSER -- "fetch (CORS)" --> DATA
   BROWSER -. "kaynak çökerse" .-> CACHE["localStorage<br/>son başarılı veri"]

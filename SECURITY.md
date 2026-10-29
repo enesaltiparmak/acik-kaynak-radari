@@ -9,7 +9,7 @@ Bildirimlere 7 gün içinde dönüş yapılır. Makine tarafından okunabilir il
 
 ## Kapsam
 
-- Yayındaki site (Cloudflare Pages) ve bu depodaki kod, workflow'lar.
+- Yayındaki site (Cloudflare Workers) ve bu depodaki kod, workflow'lar.
 - Kapsam dışı: GitHub API'nin kendisi, Cloudflare altyapısı, üçüncü taraf hizmetler.
 
 ## Uygulanan kontroller (özet)

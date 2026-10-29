@@ -36,7 +36,7 @@ Sızıntı belirtileri:
 - Actions → tüm çalıştırmalar: tanımadığınız tetikleme, değişmiş workflow dosyası, yeni dal var mı?
 - `data` dalında beklenmeyen commit var mı? (`git log origin/data`)
 - Settings → Deploy keys, Webhooks, Collaborators: yeni eklenen bir şey var mı?
-- Cloudflare Pages → Deployments: beklenmeyen dağıtım var mı?
+- Cloudflare → Workers & Pages → Deployments: beklenmeyen dağıtım var mı?
 - Token salt okunur olduğu için olası etki: sizin adınıza hız sınırı tüketimi. Yazma yetkisi yoktu.
 
 ## 5. Bildirim ve kayıt

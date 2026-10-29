@@ -13,7 +13,7 @@ flowchart LR
     DATA[("data dalı<br/>latest.json, history.json")]
     SEC[["GitHub Secrets<br/>GH_DATA_TOKEN"]]
   end
-  subgraph TB3["Güven sınırı 3: Cloudflare Pages"]
+  subgraph TB3["Güven sınırı 3: Cloudflare Workers"]
     SITE["statik site<br/>CSP + HSTS"]
   end
   API["GitHub GraphQL API"]
