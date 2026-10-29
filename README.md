@@ -10,8 +10,8 @@ Türkiye'den çıkan açık kaynak projeleri her gün takip eden, katkı verilec
 
 ## CV cümleleri
 
-- **Arayüz:** GitHub API verisini GitHub Actions ile her gün çekip kendi zaman serisini biriktiren, 500 Türk açık kaynak projesinin haftalık büyümesini ve "good first issue" fırsatlarını gösteren klavye öncelikli bir pano geliştirdim (Chart.js, Vite; Lighthouse erişilebilirlik `__`).
-- **Güvenlik:** Canlı veri ürünümün CI/CD hattını sertleştirdim: en az yetkili workflow'lar, SHA ile sabitlenmiş Actions, harden-runner ile egress engelleme ve branch protection sayesinde OpenSSF Scorecard puanını `__`'dan `__`'a çıkardım.
+- **Arayüz:** GitHub API verisini GitHub Actions ile her gün çekip kendi zaman serisini biriktiren, 500 Türk açık kaynak projesinin haftalık büyümesini ve "good first issue" fırsatlarını gösteren klavye öncelikli bir pano geliştirdim (Chart.js, Vite; Lighthouse mobil erişilebilirlik 100, performans 85).
+- **Güvenlik:** Canlı veri ürünümün CI/CD hattını sertleştirdim: en az yetkili workflow'lar, SHA ile sabitlenmiş Actions, harden-runner ile egress engelleme ve branch protection sayesinde OpenSSF Scorecard puanını 3.0'dan 6.9'a çıkardım; Mozilla Observatory ve securityheaders.com'da A+ aldım.
 
 ## Mimari
 
@@ -71,6 +71,15 @@ node --env-file=.env scripts/snapshot.mjs --out public/data
 - **Kaynak:** [GitHub GraphQL API](https://docs.github.com/graphql). Kullanım [GitHub Hizmet Şartları](https://docs.github.com/site-policy/github-terms/github-terms-of-service) ve hız sınırlarına tabidir; günde bir çekim yapılır.
 - **Gizlilik:** Kullanıcı profili, konum, takipçi veya e-posta yayımlanmaz. Konum yalnızca aramada kullanılır ve kaydedilmez. Yalnızca herkese açık depo bilgisi (ad, açıklama, dil, sayaçlar) gösterilir.
 - **Kod lisansı:** MIT.
+
+## Ölçümler (29 Ekim 2026)
+
+| Ölçüm | Sonuç | Kanıt |
+| --- | --- | --- |
+| Lighthouse mobil | Performans 85, Erişilebilirlik 100, En iyi uygulamalar 100, SEO 100 | [rapor](docs/olcumler/lighthouse-mobil.report.html) |
+| Mozilla Observatory | A+ (145 puan, 12/12 test) | [canlı sonuç](https://developer.mozilla.org/en-US/observatory/analyze?host=acik-kaynak-radari.enesaltipsrmak.workers.dev), [JSON](docs/olcumler/observatory.json) |
+| securityheaders.com | A+ | [canlı sonuç](https://securityheaders.com/?q=https%3A%2F%2Facik-kaynak-radari.enesaltipsrmak.workers.dev%2F&followRedirects=on) |
+| OpenSSF Scorecard | 3.0 → 6.9 | [önce/sonra tablosu](docs/SCORECARD.md) |
 
 ## Güvenlik
 
